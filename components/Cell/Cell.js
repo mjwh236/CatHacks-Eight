@@ -12,11 +12,11 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-const Cell = ({ value = 0 }) => {
+const Cell = ({ value = 0, x = 0, y = 0 }) => {
   const cellScale = useSharedValue(0);
 
   useEffect(() => {
-    cellScale.value = withTiming(1, { duration: 500 });
+    cellScale.value = withTiming(1, { duration: 300 });
   }, []);
 
   const rStyle = useAnimatedStyle(() => {
@@ -30,7 +30,12 @@ const Cell = ({ value = 0 }) => {
   });
 
   return (
-    <Animated.View style={[styles.cell, rStyle]}>
+    <Animated.View
+      style={[
+        styles.cell,
+        // rStyle
+      ]}
+    >
       <View
         style={{
           // backgroundColor: "blue",
@@ -42,6 +47,7 @@ const Cell = ({ value = 0 }) => {
           style={{
             textAlign: "center",
             flexDirection: "row",
+            fontSize: 28,
           }}
         >
           {value ? value : ""}
@@ -60,6 +66,6 @@ const styles = StyleSheet.create({
     margin: 5,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 15,
+    borderRadius: 10,
   },
 });

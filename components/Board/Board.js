@@ -17,7 +17,7 @@ import Cell from "../Cell";
 
 const initialCells = [
   [0, 0, 0, 0],
-  [0, 9999, 0, 0],
+  [0, 0, 0, 0],
   [0, 0, 0, 0],
   [0, 0, 0, 0],
 ];
@@ -26,7 +26,7 @@ const Board = ({ size = 4 }) => {
   const [cells, setCells] = useState(initialCells);
 
   const updateBoardOnJS = (newBoard) => {
-    console.log("you updated the board from the JS thread");
+    // console.log("you updated the board from the JS thread");
     setCells(newBoard);
   };
 
@@ -58,53 +58,169 @@ const Board = ({ size = 4 }) => {
       if (Math.abs(velocityX) > Math.abs(velocityY)) {
         // horizontal swipe
         if (velocityX > 0) {
-          // swipe right
-          console.log("Swipe Right");
-          for (let x = 0; x < cells.length; x++) {
-            for (let y = 0; y < cells[x].length; y++) {
-              // move square to the right
-              // move only squares with values
-              if (cells[x][y] !== 0) {
-                // move only square in valid range
-                if (y + 1 < cells[x].length) {
-                  // combine the same numbers
-                  if (cells[x][y + 1] === cells[x][y]) {
-                    copy[x][y + 1] += cells[x][y];
-                    copy[x][y] = 0;
-
-                    // prevent collision
-                  } else if (cells[x][y + 1] === 0) {
-                    copy[x][y + 1] = cells[x][y];
-                    copy[x][y] = 0;
-                  }
+          // console.log("Swipe Right");
+          for (let col = 2; col > -1; col--) {
+            for (let row = 0; row < 4; row++) {
+              if (col === 3) {
+                col = 2;
+              }
+              if (copy[row][col] !== 0) {
+                if (copy[row][col + 1] === copy[row][col]) {
+                  copy[row][col + 1] *= 2;
+                  copy[row][col] = 0;
+                } else if (copy[row][col + 1] === 0) {
+                  copy[row][col + 1] = copy[row][col];
+                  copy[row][col] = 0;
+                  row--; //go back a col and row to check the new spot
+                  col++;
                 }
               }
             }
           }
 
-          let x = Math.floor(Math.random() * 4);
-          let y = Math.floor(Math.random() * 4);
-          let count = 0;
-          while (copy[x][y] !== 0 && count < 10) {
-            x = Math.floor(Math.random() * 4);
-            y = Math.floor(Math.random() * 4);
-            count++;
+          let unfilledSquares = [];
+          copy.forEach((row, rdx) =>
+            row.forEach((_, cdx) => {
+              if (copy[rdx][cdx] === 0) {
+                unfilledSquares.push({ x: rdx, y: cdx });
+              }
+            })
+          );
+
+          if (unfilledSquares.length) {
+            const index = Math.floor(Math.random() * unfilledSquares.length);
+            const { x, y } = unfilledSquares[index];
+            // console.log(x, y);
+            copy[x][y] = 2;
           }
-          if (count < 9) copy[x][y] = 2;
 
           runOnJS(updateBoardOnJS)(copy);
         } else {
-          // swipe left
-          console.log("Swipe Left");
+          // console.log("Swipe Left");
+          for (let col = 1; col < 4; col++) {
+            for (let row = 0; row < 4; row++) {
+              if (col === 0) {
+                col = 1;
+              }
+              if (copy[row][col] !== 0) {
+                if (copy[row][col - 1] === copy[row][col]) {
+                  copy[row][col - 1] *= 2;
+                  copy[row][col] = 0;
+                } else if (copy[row][col - 1] === 0) {
+                  copy[row][col - 1] = copy[row][col];
+                  copy[row][col] = 0;
+                  row--; //go back a col and row to check the new spot
+                  col--;
+                }
+              }
+            }
+          }
+
+          let unfilledSquares = [];
+          copy.forEach((row, rdx) =>
+            row.forEach((_, cdx) => {
+              if (copy[rdx][cdx] === 0) {
+                unfilledSquares.push({ x: rdx, y: cdx });
+              }
+            })
+          );
+
+          if (unfilledSquares.length) {
+            const index = Math.floor(Math.random() * unfilledSquares.length);
+            const { x, y } = unfilledSquares[index];
+            // console.log(x, y);
+            copy[x][y] = 2;
+          }
+
+          runOnJS(updateBoardOnJS)(copy);
         }
       } else {
         // vertical swipe
         if (velocityY > 0) {
           // swipe right
-          console.log("Swipe Down");
+          // console.log("Swipe Down");
+
+          for (let row = 2; row > -1; row--) {
+            //go from bottom to top
+            for (let col = 0; col < 4; col++) {
+              if (row === 3) {
+                //in case checking a moved number would go out of bounds, set it back into bounds.
+                row = 2;
+              }
+              if (copy[row][col] !== 0) {
+                if (copy[row + 1][col] === copy[row][col]) {
+                  copy[row + 1][col] *= 2;
+                  copy[row][col] = 0;
+                } else if (copy[row + 1][col] === 0) {
+                  copy[row + 1][col] = copy[row][col];
+                  copy[row][col] = 0;
+                  row++; //go back a col and row to check the new spot
+                  col--;
+                }
+              }
+            }
+          }
+
+          let unfilledSquares = [];
+          copy.forEach((row, rdx) =>
+            row.forEach((_, cdx) => {
+              if (copy[rdx][cdx] === 0) {
+                unfilledSquares.push({ x: rdx, y: cdx });
+              }
+            })
+          );
+
+          if (unfilledSquares.length) {
+            const index = Math.floor(Math.random() * unfilledSquares.length);
+            const { x, y } = unfilledSquares[index];
+            // console.log(x, y);
+            copy[x][y] = 2;
+          }
+
+          runOnJS(updateBoardOnJS)(copy);
         } else {
           // swipe left
           console.log("Swipe Up");
+
+          for (let row = 1; row < 4; row++) {
+            for (let col = 0; col < 4; col++) {
+              if (row === 0) {
+                row = 1;
+              }
+              if (copy[row][col] !== 0) {
+                //the box above is at board[row-1][col]
+                if (copy[row - 1][col] === copy[row][col]) {
+                  //if the one above is the same, we combine them.
+                  copy[row - 1][col] *= 2;
+                  copy[row][col] = 0;
+                } else if (copy[row - 1][col] === 0) {
+                  //if the thing above is empty, we move it up
+                  copy[row - 1][col] = copy[row][col];
+                  copy[row][col] = 0;
+                  row--; //go back a column and row to check that spot again
+                  col--;
+                }
+              }
+            }
+          }
+
+          let unfilledSquares = [];
+          copy.forEach((row, rdx) =>
+            row.forEach((_, cdx) => {
+              if (copy[rdx][cdx] === 0) {
+                unfilledSquares.push({ x: rdx, y: cdx });
+              }
+            })
+          );
+
+          if (unfilledSquares.length) {
+            const index = Math.floor(Math.random() * unfilledSquares.length);
+            const { x, y } = unfilledSquares[index];
+            // console.log(x, y);
+            copy[x][y] = 2;
+          }
+
+          runOnJS(updateBoardOnJS)(copy);
         }
       }
     })
@@ -117,9 +233,40 @@ const Board = ({ size = 4 }) => {
         <View style={styles.container}>
           {cells.map((r, rdx) => (
             <View key={rdx} style={styles.cellRow}>
-              {r.map((c, cdx) => (
-                <Cell key={cdx} value={c} />
-              ))}
+              {r.map((c, cdx) => {
+                return cells[rdx][cdx] === 0 ? (
+                  <View
+                    key={cdx}
+                    style={{
+                      flex: 1,
+                      backgroundColor: "gray",
+                      margin: 5,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      borderRadius: 10,
+                    }}
+                  >
+                    <View
+                      style={{
+                        // backgroundColor: "blue",
+                        flex: 1,
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          flexDirection: "row",
+                        }}
+                      >
+                        {}
+                      </Text>
+                    </View>
+                  </View>
+                ) : (
+                  <Cell key={cdx} value={c} />
+                );
+              })}
             </View>
           ))}
         </View>
@@ -144,7 +291,7 @@ const styles = StyleSheet.create({
     backgroundColor: "lightgreen",
     width: "100%",
     aspectRatio: 1,
-    borderRadius: 15,
+    borderRadius: 10,
     //   height: "100%",
   },
   cellRow: {
