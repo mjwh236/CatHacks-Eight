@@ -6,11 +6,15 @@ import {
   GestureHandlerRootView,
 } from "react-native-gesture-handler";
 import Animated, {
+  FadeOut,
+  FadeOutUp,
   Layout,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
   withTiming,
+  ZoomOut,
+  ZoomOutUp,
 } from "react-native-reanimated";
 
 const cellColors = {
@@ -29,8 +33,11 @@ const cellColors = {
 
 const Cell = ({ value = 0, x = 0, y = 0 }) => {
   const cellScale = useSharedValue(0);
+  const translateX = useSharedValue(0);
 
   useEffect(() => {
+    // cellScale.value = withTiming(1, { duration: 300 });
+    cellScale.value = withTiming(0, { duration: 300 });
     cellScale.value = withTiming(1, { duration: 300 });
   }, []);
 
@@ -40,20 +47,26 @@ const Cell = ({ value = 0, x = 0, y = 0 }) => {
         {
           scale: value === 2 ? cellScale.value : 1,
         },
+        {
+          translateX: translateX.value,
+        },
       ],
     };
   });
 
   return (
     <Animated.View
-      layout={Layout.delay(3000)}
       style={[
         styles.cell,
         {
           backgroundColor: cellColors[value],
         },
-        // rStyle,
+        rStyle,
       ]}
+      exiting={FadeOut}
+      // exiting={ZoomOutUp}
+      // exiting={ZoomOut}
+      // exiting={FadeOutUp}
     >
       <View
         style={{

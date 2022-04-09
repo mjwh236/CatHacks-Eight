@@ -5,15 +5,7 @@ import {
   GestureDetector,
   GestureHandlerRootView,
 } from "react-native-gesture-handler";
-import Animated, {
-  runOnJS,
-  runOnUI,
-  useAnimatedStyle,
-  useDerivedValue,
-  useSharedValue,
-  withSpring,
-  Layout,
-} from "react-native-reanimated";
+import { runOnJS } from "react-native-reanimated";
 import Cell from "../Cell";
 
 const initialCells = [
@@ -25,10 +17,15 @@ const initialCells = [
 
 const Board = ({ size = 4 }) => {
   const [cells, setCells] = useState(initialCells);
+  const [lost, setLost] = useState(false);
 
   const updateBoardOnJS = (newBoard) => {
     // console.log("you updated the board from the JS thread");
     setCells(newBoard);
+  };
+
+  const updateLostOnJS = (bool) => {
+    setLost(bool);
   };
 
   useEffect(() => {
@@ -63,7 +60,6 @@ const Board = ({ size = 4 }) => {
 
   const panGesture = Gesture.Pan()
     .onStart((e) => {
-      console.log("Started");
       const copy = cells.map((arr) => arr.slice());
       const { velocityX, velocityY } = e;
       if (Math.abs(velocityX) > Math.abs(velocityY)) {
@@ -139,7 +135,6 @@ const Board = ({ size = 4 }) => {
           if (unfilledSquares.length) {
             const index = Math.floor(Math.random() * unfilledSquares.length);
             const { x, y } = unfilledSquares[index];
-            // console.log(x, y);
             copy[x][y] = 2;
           }
 
@@ -191,7 +186,7 @@ const Board = ({ size = 4 }) => {
           runOnJS(updateBoardOnJS)(copy);
         } else {
           // swipe left
-          console.log("Swipe Up");
+          // console.log("Swipe Up");
 
           for (let row = 1; row < 4; row++) {
             for (let col = 0; col < 4; col++) {
@@ -236,7 +231,105 @@ const Board = ({ size = 4 }) => {
       }
     })
     .onEnd((e) => {
-      console.log("Ended");
+      // console.log("Ended");
+      const copy = cells.map((arr) => arr.slice());
+      const movesLeft = false;
+
+      for (let col = 2; col > -1; col--) {
+        for (let row = 0; row < 4; row++) {
+          if (col === 3) {
+            col = 2;
+          }
+          if (copy[row][col] !== 0) {
+            if (copy[row][col + 1] === copy[row][col]) {
+              copy[row][col + 1] *= 2;
+              copy[row][col] = 0;
+            } else if (copy[row][col + 1] === 0) {
+              copy[row][col + 1] = copy[row][col];
+              copy[row][col] = 0;
+              row--; //go back a col and row to check the new spot
+              col++;
+            }
+          }
+        }
+      }
+
+      for (let col = 1; col < 4; col++) {
+        for (let row = 0; row < 4; row++) {
+          if (col === 0) {
+            col = 1;
+          }
+          if (copy[row][col] !== 0) {
+            if (copy[row][col - 1] === copy[row][col]) {
+              copy[row][col - 1] *= 2;
+              copy[row][col] = 0;
+            } else if (copy[row][col - 1] === 0) {
+              copy[row][col - 1] = copy[row][col];
+              copy[row][col] = 0;
+              row--; //go back a col and row to check the new spot
+              col--;
+            }
+          }
+        }
+      }
+
+      for (let row = 2; row > -1; row--) {
+        //go from bottom to top
+        for (let col = 0; col < 4; col++) {
+          if (row === 3) {
+            //in case checking a moved number would go out of bounds, set it back into bounds.
+            row = 2;
+          }
+          if (copy[row][col] !== 0) {
+            if (copy[row + 1][col] === copy[row][col]) {
+              copy[row + 1][col] *= 2;
+              copy[row][col] = 0;
+            } else if (copy[row + 1][col] === 0) {
+              copy[row + 1][col] = copy[row][col];
+              copy[row][col] = 0;
+              row++; //go back a col and row to check the new spot
+              col--;
+            }
+          }
+        }
+      }
+
+      for (let row = 1; row < 4; row++) {
+        for (let col = 0; col < 4; col++) {
+          if (row === 0) {
+            row = 1;
+          }
+          if (copy[row][col] !== 0) {
+            //the box above is at board[row-1][col]
+            if (copy[row - 1][col] === copy[row][col]) {
+              //if the one above is the same, we combine them.
+              copy[row - 1][col] *= 2;
+              copy[row][col] = 0;
+            } else if (copy[row - 1][col] === 0) {
+              //if the thing above is empty, we move it up
+              copy[row - 1][col] = copy[row][col];
+              copy[row][col] = 0;
+              row--; //go back a column and row to check that spot again
+              col--;
+            }
+          }
+        }
+      }
+
+      // copy.forEa(ch
+      // copy.forEach((row, idx) => if())
+      let numBlank = 0;
+      cells.forEach((r) =>
+        r.forEach((c) => {
+          if (c === 0) {
+            numBlank++;
+          }
+        })
+      );
+      if (JSON.stringify(copy) === JSON.stringify(cells) && numBlank === 0) {
+        console.log("You lost");
+        runOnJS(updateLostOnJS)(true);
+      }
     });
   return (
     <GestureHandlerRootView>
@@ -245,14 +338,15 @@ const Board = ({ size = 4 }) => {
           <View
             style={{
               width: "100%",
-              height: 100,
+              height: 150,
               justifyContent: "center",
               alignItems: "center",
             }}
           >
             <View>
+              {lost && <Text style={{ fontSize: 30 }}>You Lost :(</Text>}
               <Text style={{ fontSize: 30 }}>
-                Score:
+                Score:{" "}
                 {cells.reduce((a, b) => a.concat(b)).reduce((a, b) => a + b)}
               </Text>
             </View>
@@ -266,6 +360,7 @@ const Board = ({ size = 4 }) => {
               }}
               onPress={() => {
                 setCells(addNewValue(initialCells));
+                setLost(false);
               }}
             >
               <Text>Reset</Text>
