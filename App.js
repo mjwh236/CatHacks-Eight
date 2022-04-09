@@ -3,7 +3,6 @@ import { StyleSheet, Text, View } from "react-native";
 import "react-native-gesture-handler";
 
 import Board from "./components/Board";
-import Cell from "./components/Cell";
 
 export default function App() {
   return (
