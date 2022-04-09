@@ -7,7 +7,7 @@ const ShareButton = ({ boardView }) => {
   return (
     <Pressable
       style={{
-        backgroundColor: "plum",
+        backgroundColor: "#9EE09E",
         padding: 10,
         margin: 15,
         width: 200,
@@ -18,7 +18,7 @@ const ShareButton = ({ boardView }) => {
       }}
       onPress={() => shareAsync(boardView)}
     >
-      <Text style={{ textAlign: "center" }}>Share</Text>
+      <Text style={{ textAlign: "center", fontSize: 28 }}>Share</Text>
     </Pressable>
   );
 };

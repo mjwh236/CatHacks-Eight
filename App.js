@@ -7,16 +7,7 @@ import Board from "./components/Board";
 export default function App() {
   return (
     <View style={styles.container}>
-      {/* <View
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      > */}
-        <Board />
-      {/* </View> */}
+      <Board />
       <StatusBar style="auto" />
     </View>
   );
@@ -25,7 +16,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#d4d4d4",
     alignItems: "center",
     justifyContent: "center",
   },

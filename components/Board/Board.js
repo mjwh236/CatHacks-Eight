@@ -337,7 +337,7 @@ const Board = ({ size = 4 }) => {
   return (
     <GestureHandlerRootView>
       <GestureDetector gesture={panGesture}>
-        <View style={{ backgroundColor: "#fff" }}>
+        <View>
           <View
             style={{
               width: "100%",
@@ -355,7 +355,7 @@ const Board = ({ size = 4 }) => {
             </View>
             <Pressable
               style={{
-                backgroundColor: "lightgreen",
+                backgroundColor: "#FEB144",
                 margin: 5,
                 paddingVertical: 10,
                 paddingHorizontal: 20,
@@ -439,10 +439,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     // backgroundColor: "lightgreen",
-    backgroundColor: "#C4A484",
+    backgroundColor: "#d4d4d4",
     width: "100%",
     aspectRatio: 1,
     borderRadius: 10,
+    padding: 5,
     //   height: "100%",
   },
   cellRow: {
