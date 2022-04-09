@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 import React, { useEffect, useState } from "react";
 import {
   Gesture,
@@ -12,6 +12,7 @@ import Animated, {
   useDerivedValue,
   useSharedValue,
   withSpring,
+  Layout,
 } from "react-native-reanimated";
 import Cell from "../Cell";
 
@@ -40,14 +41,24 @@ const Board = ({ size = 4 }) => {
   }, []);
 
   const addNewValue = (board) => {
-    let x = getRandomInt(0, size);
-    let y = getRandomInt(0, size);
     const copy = board.map((arr) => arr.slice());
-    while (copy[x][y] !== 0) {
-      x = getRandomInt(0, size);
-      y = getRandomInt(0, size);
+
+    let unfilledSquares = [];
+    copy.forEach((row, rdx) =>
+      row.forEach((_, cdx) => {
+        if (copy[rdx][cdx] === 0) {
+          unfilledSquares.push({ x: rdx, y: cdx });
+        }
+      })
+    );
+
+    if (unfilledSquares.length) {
+      const index = Math.floor(Math.random() * unfilledSquares.length);
+      const { x, y } = unfilledSquares[index];
+      // console.log(x, y);
+      copy[x][y] = 2;
     }
-    return { x, y };
+    return copy;
   };
 
   const panGesture = Gesture.Pan()
@@ -230,45 +241,76 @@ const Board = ({ size = 4 }) => {
   return (
     <GestureHandlerRootView>
       <GestureDetector gesture={panGesture}>
-        <View style={styles.container}>
-          {cells.map((r, rdx) => (
-            <View key={rdx} style={styles.cellRow}>
-              {r.map((c, cdx) => {
-                return cells[rdx][cdx] === 0 ? (
-                  <View
-                    key={cdx}
-                    style={{
-                      flex: 1,
-                      backgroundColor: "gray",
-                      margin: 5,
-                      justifyContent: "center",
-                      alignItems: "center",
-                      borderRadius: 10,
-                    }}
-                  >
+        <View style={{ backgroundColor: "#fff" }}>
+          <View
+            style={{
+              width: "100%",
+              height: 100,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <View>
+              <Text style={{ fontSize: 30 }}>
+                Score:
+                {cells.reduce((a, b) => a.concat(b)).reduce((a, b) => a + b)}
+              </Text>
+            </View>
+            <Pressable
+              style={{
+                backgroundColor: "lightgreen",
+                margin: 5,
+                paddingVertical: 10,
+                paddingHorizontal: 20,
+                borderRadius: 10,
+              }}
+              onPress={() => {
+                setCells(addNewValue(initialCells));
+              }}
+            >
+              <Text>Reset</Text>
+            </Pressable>
+          </View>
+          <View style={styles.container}>
+            {cells.map((r, rdx) => (
+              <View key={rdx} style={styles.cellRow}>
+                {r.map((c, cdx) => {
+                  return cells[rdx][cdx] === 0 ? (
                     <View
+                      key={cdx}
                       style={{
-                        // backgroundColor: "blue",
                         flex: 1,
+                        backgroundColor: "gray",
+                        margin: 5,
                         justifyContent: "center",
+                        alignItems: "center",
+                        borderRadius: 10,
                       }}
                     >
-                      <Text
+                      <View
                         style={{
-                          textAlign: "center",
-                          flexDirection: "row",
+                          // backgroundColor: "blue",
+                          flex: 1,
+                          justifyContent: "center",
                         }}
                       >
-                        {}
-                      </Text>
+                        <Text
+                          style={{
+                            textAlign: "center",
+                            flexDirection: "row",
+                          }}
+                        >
+                          {}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                ) : (
-                  <Cell key={cdx} value={c} />
-                );
-              })}
-            </View>
-          ))}
+                  ) : (
+                    <Cell key={cdx} value={c} />
+                  );
+                })}
+              </View>
+            ))}
+          </View>
         </View>
       </GestureDetector>
     </GestureHandlerRootView>
@@ -288,7 +330,8 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "lightgreen",
+    // backgroundColor: "lightgreen",
+    backgroundColor: "#C4A484",
     width: "100%",
     aspectRatio: 1,
     borderRadius: 10,
