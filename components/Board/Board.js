@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Pressable } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Gesture,
   GestureDetector,
@@ -7,6 +7,7 @@ import {
 } from "react-native-gesture-handler";
 import { runOnJS } from "react-native-reanimated";
 import Cell from "../Cell";
+import ShareButton from "../ShareButton";
 
 const initialCells = [
   [0, 0, 0, 0],
@@ -18,6 +19,8 @@ const initialCells = [
 const Board = ({ size = 4 }) => {
   const [cells, setCells] = useState(initialCells);
   const [lost, setLost] = useState(false);
+
+  const boardRef = useRef();
 
   const updateBoardOnJS = (newBoard) => {
     // console.log("you updated the board from the JS thread");
@@ -366,7 +369,7 @@ const Board = ({ size = 4 }) => {
               <Text>Reset</Text>
             </Pressable>
           </View>
-          <View style={styles.container}>
+          <View ref={boardRef} style={styles.container}>
             {cells.map((r, rdx) => (
               <View key={rdx} style={styles.cellRow}>
                 {r.map((c, cdx) => {
@@ -405,6 +408,16 @@ const Board = ({ size = 4 }) => {
                 })}
               </View>
             ))}
+          </View>
+          <View
+            style={{
+              width: "100%",
+              height: 125,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ShareButton boardView={boardRef} />
           </View>
         </View>
       </GestureDetector>
