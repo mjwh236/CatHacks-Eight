@@ -23,7 +23,9 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "permissions": [],
+      "package": "com.mjwh236.CatHacksEight"
     },
     "web": {
       "favicon": "./assets/favicon.png"
